@@ -1,0 +1,15 @@
+3
+A C D
+J H G E
+B S W R
+A 3 M1
+B 5 M2
+C 8 M3
+D 9 M1
+E 12 M2
+G 23 M3
+H 12 M1
+J 14 M2
+R 6 M2
+S 3 M3
+W 9 M3
