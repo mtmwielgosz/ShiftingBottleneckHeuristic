@@ -4,17 +4,19 @@ import java.util.List;
 
 public class Order {
 
-    private List<String> allOrders;
+    private int orderId;
+    private List<String> allJobs;
 
-    public List<String> getAllOrders() {
-        return allOrders;
+    public List<String> getAllJobs() {
+        return allJobs;
     }
 
-    public void setAllOrders(List<String> allOrders) {
-        this.allOrders = allOrders;
+    public int getOrderId() {
+        return orderId;
     }
 
-    public Order(List<String> allOrders) {
-        this.allOrders = allOrders;
+    public Order(int orderId, List<String> allJobs) {
+        this.orderId = orderId;
+        this.allJobs = allJobs;
     }
 }

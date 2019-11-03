@@ -1,0 +1,14 @@
+3
+A B C
+D E F G
+H I J
+A 10 M1
+B 8 M2
+C 4 M3
+D 8 M2
+E 3 M1
+F 5 M4
+G 6 M3
+H 4 M1
+I 7 M2
+J 3 M4
