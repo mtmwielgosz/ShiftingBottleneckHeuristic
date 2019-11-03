@@ -1,6 +1,7 @@
 package systems.hedgehog.algorithm;
 
 import systems.hedgehog.model.graph.Graph;
+import systems.hedgehog.model.graph.SecGraph;
 import systems.hedgehog.model.graph.subelement.Edge;
 import systems.hedgehog.model.graph.subelement.Subgraph;
 import systems.hedgehog.model.result.SchedulingResult;
@@ -83,6 +84,18 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
         allSubgraph.addAll(minimalizedSubgraphs4);
 
         Subgraph maxMakespan = allSubgraph.stream().max(Comparator.comparing(Subgraph::getMaxMakespan)).get();
+
+        List<Edge> edges = maxMakespan.getEdges();
+
+        for(int index = 0; index < edges.size() - 1; index++) {
+            Edge currentEdge = edges.get(index);
+            Edge nextEdge = edges.get(index + 1);
+            graph.addEdge(graph.getOrder(nextEdge).get().getOrderId(), currentEdge.getFirstNode(), nextEdge.getFirstNode());
+        }
+
+
+        SecGraph secGraph = new SecGraph(graph);
+        System.out.println(secGraph.getMakespan());
 
         return null;
     }

@@ -1,6 +1,8 @@
 package systems.hedgehog.factory;
 
 import systems.hedgehog.model.graph.Graph;
+import systems.hedgehog.model.graph.SecGraph;
+import systems.hedgehog.model.graph.subelement.Edge;
 import systems.hedgehog.model.graph.subelement.Node;
 import systems.hedgehog.model.struct.Order;
 
@@ -18,7 +20,6 @@ public class GraphFactory {
     public static Graph generateGraph(String srcFile) throws IOException {
 
         List<Node> allNodes = new ArrayList<>();
-
         List<String> source = Files.readAllLines(Paths.get(srcFile), Charset.forName("UTF-8"));
         int numberOfOrders = Integer.valueOf(source.get(0));
         List<Order> allOrders = new LinkedList<>();
