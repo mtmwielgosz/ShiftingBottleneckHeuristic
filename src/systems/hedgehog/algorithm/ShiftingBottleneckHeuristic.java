@@ -4,10 +4,8 @@ import systems.hedgehog.model.graph.Graph;
 import systems.hedgehog.model.graph.subelement.Edge;
 import systems.hedgehog.model.result.SchedulingResult;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class ShiftingBottleneckHeuristic implements Algorithm {
 
@@ -29,7 +27,17 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
         System.out.println(graph.getProductionTimeFor("M2", 2) + " " + graph.getReleaseTimeFor("M2", 2)
                 + " " + graph.getDueDateFor("M2", 2));
 
-        List<Edge> edges = graph.latenessEdges("M1", 0, 0, new LinkedList<>());
+        List<Edge> edges0 = graph.getMaxLatenessEdgesFor("M1", 0, 0, new LinkedList<>());
+
+        List<Edge> edges1 = graph.getMaxLatenessEdgesFor("M1", 1, 0, new LinkedList<>());
+
+        List<Edge> edges2 = graph.getMaxLatenessEdgesFor("M1", 2, 0, new LinkedList<>());
+
+        List<Edge> edges00 = graph.getMaxLatenessEdgesForEndingOrder("M1", 0, 0, new LinkedList<>());
+
+        List<Edge> edges01 = graph.getMaxLatenessEdgesForEndingOrder("M1", 1, 0, new LinkedList<>());
+
+        List<Edge> edges02 = graph.getMaxLatenessEdgesForEndingOrder("M1", 2, 0, new LinkedList<>());
 
         return null;
     }
