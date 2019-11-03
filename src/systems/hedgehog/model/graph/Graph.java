@@ -1,7 +1,9 @@
 package systems.hedgehog.model.graph;
 
+import com.sun.org.apache.xpath.internal.operations.Or;
 import systems.hedgehog.model.graph.subelement.Edge;
 import systems.hedgehog.model.graph.subelement.Node;
+import systems.hedgehog.model.graph.subelement.Subgraph;
 import systems.hedgehog.model.struct.OrderInGraph;
 
 import java.util.*;
@@ -42,7 +44,7 @@ public class Graph {
             if(currentOrder.getOrderId() != notOrderId) {
                 return edges.stream().filter(edge -> currentMachine.equals(edge.getFirstNode().getMachine()))
                         .filter(edge -> !notInEdge.contains(edge))
-                        .filter(edge -> getReleaseTimeFor(currentMachine, currentOrder.getOrderId()) <= currentMakespan)
+          //              .filter(edge -> getReleaseTimeFor(currentMachine, currentOrder.getOrderId()) >= currentMakespan)
                         .findFirst();
             }
         }
@@ -52,12 +54,12 @@ public class Graph {
     public int getMakespan() {
         int maxMakespan = 0;
         for(OrderInGraph currentOrder : orders) {
-            int makespanForOrder = currentOrder.getJobsInOrder().stream().flatMapToInt(order -> IntStream.of(order.getWeight())).sum();
+            int makespanForOrder = getCurrentMaxMakespan(currentOrder.getJobsInOrder());
             if(makespanForOrder > maxMakespan) {
                 maxMakespan = makespanForOrder;
             }
         }
-        return  maxMakespan;
+        return maxMakespan;
     }
 
     public Edge addEdge(int orderId, Node srcNode, Node destNode) {
@@ -90,12 +92,24 @@ public class Graph {
         return releaseTime;
     }
 
+    public int getReleaseTimeFor(Edge edge, int orderId) {
+        Optional<Edge> currentEdge = getStartEdgeFor(orderId);
+        int releaseTime = 0;
+        while(currentEdge.isPresent() && !edge.equals(currentEdge.get())) {
+            releaseTime += currentEdge.get().getWeight();
+            currentEdge = getNextEdgeFor(currentEdge.get(), orderId);
+        }
+        return releaseTime;
+    }
+
     public int getDueDateFor(String currentMachine, int orderId) {
         Optional<Edge> currentEdge = getStartEdgeFor(orderId);
         while(currentEdge.isPresent() && !currentMachine.equals(currentEdge.get().getFirstNode().getMachine())) {
             currentEdge = getNextEdgeFor(currentEdge.get(), orderId);
         }
-        currentEdge = getNextEdgeFor(currentEdge.get(), orderId);
+        if(currentEdge.isPresent()) {
+            currentEdge = getNextEdgeFor(currentEdge.get(), orderId);
+        }
 
         int succeedingProcessingTime = 0;
         while(currentEdge.isPresent()) {
@@ -116,7 +130,9 @@ public class Graph {
         return visitedEdges;
     }
 
-    public List<Edge> getLatenessEdgesForEndingOrder(String currentMachine, int startingOrderId, int endingOrderId, int currentMakespan, List<Edge> visitedEdges) {
+    public List<Edge> getLatenessSubgraph(String currentMachine, int startingOrderId, int endingOrderId) {
+        List<Edge> visitedEdges = new LinkedList<>();
+        int currentMakespan = 0;
         if (startingOrderId != endingOrderId) {
             Optional<Edge> currentEdge = getStartEdgeFor(startingOrderId);
             currentEdge = getNextEdgeFor(currentEdge.get(), startingOrderId);
@@ -125,8 +141,10 @@ public class Graph {
                 subGraph.add(currentEdge.get());
                 currentEdge = getNextEdgeFor(currentEdge.get(), startingOrderId);
             }
-            visitedEdges.add(currentEdge.get());
-            currentMakespan += currentEdge.get().getWeight();
+            if(currentEdge.isPresent()) {
+                visitedEdges.add(currentEdge.get());
+                currentMakespan += currentEdge.get().getWeight();
+            }
             subGraph.addAll(getMaxLatenessSubgraphFor(currentMachine, startingOrderId, currentMakespan, visitedEdges));
             addSucceedingEdges(endingOrderId, subGraph);
             return subGraph;
@@ -134,25 +152,74 @@ public class Graph {
         return new LinkedList<>();
     }
 
-    private List<Edge> getLatenessEdgesFor(String currentMachine, int orderId, int currentMakespan, List<Edge> visitedEdges) {
-        Optional<Edge> currentEdge = getStartEdgeFor(orderId);
-        currentEdge = getNextEdgeFor(currentEdge.get(), orderId);
-        if(currentMachine.equals(currentEdge.get().getFirstNode().getMachine())) {
-            visitedEdges.add(currentEdge.get());
-            currentMakespan += currentEdge.get().getWeight();
-            List<Edge> subGraph = getMaxLatenessSubgraphFor(currentMachine, orderId, currentMakespan, visitedEdges);
-            Edge lastEdge = subGraph.get(subGraph.size() - 1);
-            Optional<OrderInGraph> currentOrder = orders.stream().filter(order -> order.getJobsInOrder().contains(lastEdge)).findFirst();
-            if (currentOrder.isPresent()) {
-                Optional<Edge> nextEdge = getNextEdgeFor(lastEdge, currentOrder.get().getOrderId());
-                while (nextEdge.isPresent()) {
-                    subGraph.add(nextEdge.get());
-                    nextEdge = getNextEdgeFor(nextEdge.get(), currentOrder.get().getOrderId());
+    public List<Subgraph> getMaximumLatenessSubgraphsFor(String currentMachine) {
+        int minimalizedMaxMakespan = Integer.MAX_VALUE;
+        List<Subgraph> subgraphs = new ArrayList<>();
+        for(OrderInGraph endingOrder : orders) {
+            List<Edge> graphToAdd = new LinkedList<>();
+            for(OrderInGraph startingOrder: orders) {
+                List<Edge> currentLatenessSubgraph = getLatenessSubgraph(currentMachine, startingOrder.getOrderId(), endingOrder.getOrderId());
+                if(!currentLatenessSubgraph.isEmpty()) {
+                    int currentMaxMakespan = getCurrentMaxMakespan(currentLatenessSubgraph);
+                    if (currentMaxMakespan < minimalizedMaxMakespan) {
+                        minimalizedMaxMakespan = currentMaxMakespan;
+                        graphToAdd = currentLatenessSubgraph;
+                    }
                 }
             }
-            return subGraph;
+            subgraphs.add(new Subgraph(endingOrder.getOrderId(), graphToAdd, minimalizedMaxMakespan));
+            minimalizedMaxMakespan = Integer.MAX_VALUE;
         }
-        return new LinkedList<>();
+        return subgraphs;
+    }
+
+    private int getCurrentMaxMakespan(List<Edge> currentLatenessSubgraph) {
+
+        int maxMakespan = 0;
+        for(int index = 0; index < currentLatenessSubgraph.size() - 1; index++) {
+            Edge currentEdge = currentLatenessSubgraph.get(index);
+            Optional<OrderInGraph> currentOrder = orders.stream().filter(order -> order.getJobsInOrder().contains(currentEdge)).findFirst();
+            Edge nextEdge = currentLatenessSubgraph.get(index + 1);
+            Optional<OrderInGraph> nextOrder = orders.stream().filter(order -> order.getJobsInOrder().contains(nextEdge)).findFirst();
+            if (currentOrder.isPresent() && nextOrder.isPresent()) {
+                int releaseTimeOfCurrentEdge = getReleaseTimeFor(currentEdge, currentOrder.get().getOrderId());
+                int releaseTimeOfNextEdge = getReleaseTimeFor(nextEdge, nextOrder.get().getOrderId());
+                if (releaseTimeOfNextEdge > releaseTimeOfCurrentEdge + currentEdge.getWeight()) {
+                    maxMakespan += releaseTimeOfNextEdge - releaseTimeOfCurrentEdge;
+                } else {
+                    maxMakespan += currentEdge.getWeight();
+                }
+            }
+        }
+        return maxMakespan + currentLatenessSubgraph.get(currentLatenessSubgraph.size() - 1).getWeight();
+    }
+
+    public List<Subgraph> getReducedMaximumLatenessSubgraphsFor(String currentMachine) {
+        List<Subgraph> subgraphs = getMaximumLatenessSubgraphsFor(currentMachine);
+        List<Subgraph> minimalizedSubgraphs = new LinkedList<>();
+        Subgraph minimalizedMaxLateness = subgraphs.stream().min(Comparator.comparing(Subgraph::getMaxMakespan)).get();
+        for(OrderInGraph currentOrder : orders) {
+            List<Edge> minimalizedEdges = new ArrayList<>(minimalizedMaxLateness.getEdges());
+            Optional<Edge> lastEdge = minimalizedEdges.stream().filter(edge -> currentOrder.getJobsInOrder().contains(edge)).findFirst();
+            if (lastEdge.isPresent()) {
+                minimalizedEdges = minimalizedEdges.subList(0, minimalizedEdges.indexOf(lastEdge.get()) + 1);
+                Optional<Edge> nextEdge = getNextEdgeFor(lastEdge.get(), currentOrder.getOrderId());
+                while (nextEdge.isPresent()) {
+                    minimalizedEdges.add(nextEdge.get());
+                    nextEdge = getNextEdgeFor(nextEdge.get(), currentOrder.getOrderId());
+                }
+            }
+            int minimizedMaxMakespan = getCurrentMaxMakespan(minimalizedEdges);
+            minimalizedSubgraphs.add(new Subgraph(currentOrder.getOrderId(), minimalizedEdges, minimizedMaxMakespan));
+        }
+        return minimalizedSubgraphs;
+    }
+
+    public int getMinimizedLatenessFor(String currentMachine, int orderId) {
+        List<Subgraph> minimizedSubgraph = getReducedMaximumLatenessSubgraphsFor(currentMachine);
+        return minimizedSubgraph.stream().filter(subgraph -> subgraph.getOrderId() == orderId)
+                .flatMapToInt(subgraph -> IntStream.of(subgraph.getMaxMakespan())).sum() - getMakespan();
+
     }
 
     private void addSucceedingEdges(int endingOrderId, List<Edge> subGraph) {
