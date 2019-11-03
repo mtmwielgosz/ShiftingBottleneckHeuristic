@@ -27,17 +27,17 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
         System.out.println(graph.getProductionTimeFor("M2", 2) + " " + graph.getReleaseTimeFor("M2", 2)
                 + " " + graph.getDueDateFor("M2", 2));
 
-        List<Edge> edges0 = graph.getMaxLatenessEdgesFor("M1", 0, 0, new LinkedList<>());
+        List<Edge> edges01 = graph.getLatenessEdgesForEndingOrder("M1", 0, 1,0, new LinkedList<>());
 
-        List<Edge> edges1 = graph.getMaxLatenessEdgesFor("M1", 1, 0, new LinkedList<>());
+        List<Edge> edges02 = graph.getLatenessEdgesForEndingOrder("M1", 0, 2,0, new LinkedList<>());
 
-        List<Edge> edges2 = graph.getMaxLatenessEdgesFor("M1", 2, 0, new LinkedList<>());
+        List<Edge> edges20 = graph.getLatenessEdgesForEndingOrder("M1", 2, 0,0, new LinkedList<>());
 
-        List<Edge> edges00 = graph.getMaxLatenessEdgesForEndingOrder("M1", 0, 0, new LinkedList<>());
+        List<Edge> edges21 = graph.getLatenessEdgesForEndingOrder("M1", 2, 1,0, new LinkedList<>());
 
-        List<Edge> edges01 = graph.getMaxLatenessEdgesForEndingOrder("M1", 1, 0, new LinkedList<>());
+        List<Edge> edges12 = graph.getLatenessEdgesForEndingOrder("M1", 1, 2,0, new LinkedList<>());
 
-        List<Edge> edges02 = graph.getMaxLatenessEdgesForEndingOrder("M1", 2, 0, new LinkedList<>());
+        List<Edge> edges00 = graph.getLatenessEdgesForEndingOrder("M1", 0, 0,0, new LinkedList<>());
 
         return null;
     }

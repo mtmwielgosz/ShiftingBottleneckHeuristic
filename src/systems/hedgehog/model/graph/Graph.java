@@ -116,7 +116,25 @@ public class Graph {
         return visitedEdges;
     }
 
-    public List<Edge> getMaxLatenessEdgesFor(String currentMachine, int orderId, int currentMakespan, List<Edge> visitedEdges) {
+    public List<Edge> getLatenessEdgesForEndingOrder(String currentMachine, int startingOrderId, int endingOrderId, int currentMakespan, List<Edge> visitedEdges) {
+        if (startingOrderId != endingOrderId) {
+            Optional<Edge> currentEdge = getStartEdgeFor(startingOrderId);
+            currentEdge = getNextEdgeFor(currentEdge.get(), startingOrderId);
+            List<Edge> subGraph = new LinkedList<>();
+            while(currentEdge.isPresent() && !currentMachine.equals(currentEdge.get().getFirstNode().getMachine())) {
+                subGraph.add(currentEdge.get());
+                currentEdge = getNextEdgeFor(currentEdge.get(), startingOrderId);
+            }
+            visitedEdges.add(currentEdge.get());
+            currentMakespan += currentEdge.get().getWeight();
+            subGraph.addAll(getMaxLatenessSubgraphFor(currentMachine, startingOrderId, currentMakespan, visitedEdges));
+            addSucceedingEdges(endingOrderId, subGraph);
+            return subGraph;
+        }
+        return new LinkedList<>();
+    }
+
+    private List<Edge> getLatenessEdgesFor(String currentMachine, int orderId, int currentMakespan, List<Edge> visitedEdges) {
         Optional<Edge> currentEdge = getStartEdgeFor(orderId);
         currentEdge = getNextEdgeFor(currentEdge.get(), orderId);
         if(currentMachine.equals(currentEdge.get().getFirstNode().getMachine())) {
@@ -137,35 +155,23 @@ public class Graph {
         return new LinkedList<>();
     }
 
-    public List<Edge> getMaxLatenessEdgesForEndingOrder(String currentMachine, int endingOrderId, int currentMakespan, List<Edge> visitedEdges) {
-        int maxLateness = 0;
-        for(OrderInGraph currentOrder : orders) {
-            if (currentOrder.getOrderId() != endingOrderId) {
-                Optional<Edge> currentEdge = getStartEdgeFor(currentOrder.getOrderId());
-                currentEdge = getNextEdgeFor(currentEdge.get(), currentOrder.getOrderId());
-                if (currentMachine.equals(currentEdge.get().getFirstNode().getMachine())) {
-                    visitedEdges.add(currentEdge.get());
-                    currentMakespan += currentEdge.get().getWeight();
-                    List<Edge> subGraph = getMaxLatenessSubgraphFor(currentMachine, currentOrder.getOrderId(), currentMakespan, visitedEdges);
-                    Optional<OrderInGraph> endingOrder = orders.stream().filter(order -> order.getOrderId() == endingOrderId).findFirst();
-                    if (endingOrder.isPresent()) {
-                        Optional<Edge> lastEdge = subGraph.stream().filter(edge -> endingOrder.get().getJobsInOrder().contains(edge)).findFirst();
-                        if (lastEdge.isPresent()) {
-                            for (int index = subGraph.indexOf(lastEdge.get()) + 1; index < subGraph.size(); index++) {
-                                subGraph.remove(index);
-                            }
-                            Optional<Edge> nextEdge = getNextEdgeFor(lastEdge.get(), endingOrder.get().getOrderId());
-                            while (nextEdge.isPresent()) {
-                                subGraph.add(nextEdge.get());
-                                nextEdge = getNextEdgeFor(nextEdge.get(), endingOrder.get().getOrderId());
-                            }
-                        }
-                    }
-                    return subGraph;
+    private void addSucceedingEdges(int endingOrderId, List<Edge> subGraph) {
+        Optional<OrderInGraph> endingOrder = orders.stream().filter(order -> order.getOrderId() == endingOrderId).findFirst();
+        if (endingOrder.isPresent()) {
+            Optional<Edge> lastEdge = subGraph.stream().filter(edge -> endingOrder.get().getJobsInOrder().contains(edge)).findFirst();
+            if (lastEdge.isPresent()) {
+                for (int index = subGraph.indexOf(lastEdge.get()) + 1; index < subGraph.size(); index++) {
+                    Edge toSwap = subGraph.get(index);
+                    subGraph.set(index - 1, toSwap);
+                    subGraph.set(index, lastEdge.get());
+                }
+                Optional<Edge> nextEdge = getNextEdgeFor(lastEdge.get(), endingOrderId);
+                while (nextEdge.isPresent()) {
+                    subGraph.add(nextEdge.get());
+                    nextEdge = getNextEdgeFor(nextEdge.get(), endingOrderId);
                 }
             }
         }
-        return new LinkedList<>();
     }
 
     public void setString(String stringGraph) {
