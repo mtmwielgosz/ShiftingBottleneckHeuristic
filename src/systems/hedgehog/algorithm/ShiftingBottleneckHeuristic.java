@@ -15,6 +15,7 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
     @Override
     public List<SchedulingResult> findScheduling(Graph graph) {
 
+        System.out.println("M1");
         System.out.println(graph.getMakespan());
         System.out.println(graph.getProductionTimeFor("M1", 0) + " " + graph.getReleaseTimeFor("M1", 0)
                 + " " + graph.getDueDateFor("M1", 0)
@@ -26,6 +27,7 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
                 + " " + graph.getDueDateFor("M1", 2)
                 + " " + graph.getMinimizedLatenessFor("M1", 2));
 
+        System.out.println("M2");
         System.out.println(graph.getProductionTimeFor("M2", 0) + " " + graph.getReleaseTimeFor("M2", 0)
                 + " " + graph.getDueDateFor("M2", 0)
                 + " " + graph.getMinimizedLatenessFor("M2", 0));
@@ -36,19 +38,15 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
                 + " " + graph.getDueDateFor("M2", 2)
                 + " " + graph.getMinimizedLatenessFor("M2", 2));
 
+        System.out.println("M3");
         System.out.println(graph.getProductionTimeFor("M3", 0) + " " + graph.getReleaseTimeFor("M3", 0)
                 + " " + graph.getDueDateFor("M3", 0)
                 + " " + graph.getMinimizedLatenessFor("M3", 0));
         System.out.println(graph.getProductionTimeFor("M3", 1) + " " + graph.getReleaseTimeFor("M3", 1)
                 + " " + graph.getDueDateFor("M3", 1)
                 + " " + graph.getMinimizedLatenessFor("M3", 1));
-        System.out.println(graph.getProductionTimeFor("M3", 2) + " " + graph.getReleaseTimeFor("M3", 2)
-                + " " + graph.getDueDateFor("M3", 2)
-                + " " + graph.getMinimizedLatenessFor("M3", 2));
 
-        System.out.println(graph.getProductionTimeFor("M4", 0) + " " + graph.getReleaseTimeFor("M4", 0)
-                + " " + graph.getDueDateFor("M4", 0)
-                + " " + graph.getMinimizedLatenessFor("M4", 0));
+        System.out.println("M4");
         System.out.println(graph.getProductionTimeFor("M4", 1) + " " + graph.getReleaseTimeFor("M4", 1)
                 + " " + graph.getDueDateFor("M4", 1)
                 + " " + graph.getMinimizedLatenessFor("M4", 1));
@@ -90,12 +88,32 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
         for(int index = 0; index < edges.size() - 1; index++) {
             Edge currentEdge = edges.get(index);
             Edge nextEdge = edges.get(index + 1);
-            graph.addEdge(graph.getOrder(nextEdge).get().getOrderId(), currentEdge.getFirstNode(), nextEdge.getFirstNode());
+            graph.addEdge(graph.getOrder(currentEdge).get().getOrderId(), currentEdge.getFirstNode(), nextEdge.getFirstNode());
         }
 
+        System.out.println("M2 after 1st iter");
+        System.out.println(graph.getProductionTimeFor("M2", 0) + " " + graph.getReleaseTimeFor2("M2", 0)
+                + " " + graph.getDueDateFor("M2", 0)
+                + " " + graph.getMinimizedLatenessFor("M2", 0));
+        System.out.println(graph.getProductionTimeFor("M2", 1) + " " + graph.getReleaseTimeFor2("M2", 1)
+                + " " + graph.getDueDateFor("M2", 1)
+                + " " + graph.getMinimizedLatenessFor("M2", 1));
+        System.out.println(graph.getProductionTimeFor("M2", 2) + " " + graph.getReleaseTimeFor2("M2", 2)
+                + " " + graph.getDueDateFor("M2", 2)
+                + " " + graph.getMinimizedLatenessFor("M2", 2));
+        System.out.println("M3 after 1st iter");
+        System.out.println(graph.getProductionTimeFor("M3", 0) + " " + graph.getReleaseTimeFor2("M3", 0)
+                + " " + graph.getDueDateFor("M3", 0)
+                + " " + graph.getMinimizedLatenessFor("M3", 0));
+        System.out.println(graph.getProductionTimeFor("M3", 1) + " " + graph.getReleaseTimeFor2("M3", 1)
+                + " " + graph.getDueDateFor("M3", 1)
+                + " " + graph.getMinimizedLatenessFor("M3", 1));
 
-        SecGraph secGraph = new SecGraph(graph);
-        System.out.println(secGraph.getMakespan());
+        System.out.println(" Order 0 Makespan:" + graph.getMakespanForOrder(0));
+        System.out.println(" Order 1 Makespan:" + graph.getMakespanForOrder(1));
+        System.out.println(" Order 2 Makespan:" + graph.getMakespanForOrder(2));
+
+
 
         return null;
     }

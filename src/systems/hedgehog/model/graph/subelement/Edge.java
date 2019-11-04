@@ -1,5 +1,7 @@
 package systems.hedgehog.model.graph.subelement;
 
+import java.util.Objects;
+
 public class Edge {
 
     private Node firstNode;
@@ -32,5 +34,10 @@ public class Edge {
                     && weight.equals(((Edge) anotherEdge).getWeight());
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstNode, weight, secondNode);
     }
 }
