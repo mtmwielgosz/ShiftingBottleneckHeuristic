@@ -1,7 +1,6 @@
 package systems.hedgehog.algorithm;
 
 import systems.hedgehog.model.graph.Graph;
-import systems.hedgehog.model.graph.SecGraph;
 import systems.hedgehog.model.graph.subelement.Edge;
 import systems.hedgehog.model.graph.subelement.Subgraph;
 import systems.hedgehog.model.result.SchedulingResult;
@@ -17,41 +16,44 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
 
         System.out.println("M1");
         System.out.println(graph.getMakespan());
-        System.out.println(graph.getProductionTimeFor("M1", 0) + " " + graph.getReleaseTimeFor("M1", 0)
-                + " " + graph.getDueDateFor("M1", 0)
-                + " " + graph.getMinimizedLatenessFor("M1", 0));
-        System.out.println(graph.getProductionTimeFor("M1", 1) + " " + graph.getReleaseTimeFor("M1", 1)
-                + " " + graph.getDueDateFor("M1", 1)
-                + " " + graph.getMinimizedLatenessFor("M1", 1));
-        System.out.println(graph.getProductionTimeFor("M1", 2) + " " + graph.getReleaseTimeFor("M1", 2)
-                + " " + graph.getDueDateFor("M1", 2)
-                + " " + graph.getMinimizedLatenessFor("M1", 2));
+        System.out.println(graph.getProductionTimeFor2("M1", 0) + " " + graph.getReleaseTimeFor2("M1", 0)
+                + " " + graph.getDueDateFor2("M1", 0)
+                + " " + graph.getMinimizedLatenessFor("M1", 0)
+                + "R-lateness: " + graph.getRealMaxLatenessFor("M1", 0));
+        System.out.println(graph.getProductionTimeFor2("M1", 1) + " " + graph.getReleaseTimeFor2("M1", 1)
+                + " " + graph.getDueDateFor2("M1", 1)
+                + " " + graph.getMinimizedLatenessFor("M1", 1)
+                + "R-lateness: " + graph.getRealMaxLatenessFor("M1", 1));
+        System.out.println(graph.getProductionTimeFor2("M1", 2) + " " + graph.getReleaseTimeFor2("M1", 2)
+                + " " + graph.getDueDateFor2("M1", 2)
+                + " " + graph.getMinimizedLatenessFor("M1", 2)
+                + "R-lateness: " + graph.getRealMaxLatenessFor("M1", 2));
 
         System.out.println("M2");
-        System.out.println(graph.getProductionTimeFor("M2", 0) + " " + graph.getReleaseTimeFor("M2", 0)
-                + " " + graph.getDueDateFor("M2", 0)
+        System.out.println(graph.getProductionTimeFor2("M2", 0) + " " + graph.getReleaseTimeFor2("M2", 0)
+                + " " + graph.getDueDateFor2("M2", 0)
                 + " " + graph.getMinimizedLatenessFor("M2", 0));
-        System.out.println(graph.getProductionTimeFor("M2", 1) + " " + graph.getReleaseTimeFor("M2", 1)
-                + " " + graph.getDueDateFor("M2", 1)
+        System.out.println(graph.getProductionTimeFor2("M2", 1) + " " + graph.getReleaseTimeFor2("M2", 1)
+                + " " + graph.getDueDateFor2("M2", 1)
                 + " " + graph.getMinimizedLatenessFor("M2", 1));
-        System.out.println(graph.getProductionTimeFor("M2", 2) + " " + graph.getReleaseTimeFor("M2", 2)
-                + " " + graph.getDueDateFor("M2", 2)
+        System.out.println(graph.getProductionTimeFor2("M2", 2) + " " + graph.getReleaseTimeFor2("M2", 2)
+                + " " + graph.getDueDateFor2("M2", 2)
                 + " " + graph.getMinimizedLatenessFor("M2", 2));
 
         System.out.println("M3");
-        System.out.println(graph.getProductionTimeFor("M3", 0) + " " + graph.getReleaseTimeFor("M3", 0)
-                + " " + graph.getDueDateFor("M3", 0)
+        System.out.println(graph.getProductionTimeFor2("M3", 0) + " " + graph.getReleaseTimeFor2("M3", 0)
+                + " " + graph.getDueDateFor2("M3", 0)
                 + " " + graph.getMinimizedLatenessFor("M3", 0));
-        System.out.println(graph.getProductionTimeFor("M3", 1) + " " + graph.getReleaseTimeFor("M3", 1)
-                + " " + graph.getDueDateFor("M3", 1)
+        System.out.println(graph.getProductionTimeFor2("M3", 1) + " " + graph.getReleaseTimeFor2("M3", 1)
+                + " " + graph.getDueDateFor2("M3", 1)
                 + " " + graph.getMinimizedLatenessFor("M3", 1));
 
         System.out.println("M4");
-        System.out.println(graph.getProductionTimeFor("M4", 1) + " " + graph.getReleaseTimeFor("M4", 1)
-                + " " + graph.getDueDateFor("M4", 1)
+        System.out.println(graph.getProductionTimeFor2("M4", 1) + " " + graph.getReleaseTimeFor2("M4", 1)
+                + " " + graph.getDueDateFor2("M4", 1)
                 + " " + graph.getMinimizedLatenessFor("M4", 1));
-        System.out.println(graph.getProductionTimeFor("M4", 2) + " " + graph.getReleaseTimeFor("M4", 2)
-                + " " + graph.getDueDateFor("M4", 2)
+        System.out.println(graph.getProductionTimeFor2("M4", 2) + " " + graph.getReleaseTimeFor2("M4", 2)
+                + " " + graph.getDueDateFor2("M4", 2)
                 + " " + graph.getMinimizedLatenessFor("M4", 2));
 
         List<Edge> edges01 = graph.getLatenessSubgraph("M1", 0, 1);
@@ -92,21 +94,31 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
         }
 
         System.out.println("M2 after 1st iter");
-        System.out.println(graph.getProductionTimeFor("M2", 0) + " " + graph.getReleaseTimeFor2("M2", 0)
-                + " " + graph.getDueDateFor("M2", 0)
+        System.out.println(graph.getProductionTimeFor2("M2", 0) + "R-Prod" + graph.getRealProductionTimeFor("M2", 0)
+                + " " + graph.getReleaseTimeFor2("M2", 0)
+                + " R" + graph.getRealReleaseTimeFor2("M2", 0)
+                + " " + graph.getDueDateFor2("M2", 0)
                 + " " + graph.getMinimizedLatenessFor("M2", 0));
-        System.out.println(graph.getProductionTimeFor("M2", 1) + " " + graph.getReleaseTimeFor2("M2", 1)
-                + " " + graph.getDueDateFor("M2", 1)
+        System.out.println(graph.getProductionTimeFor2("M2", 1) + "R-Prod" + graph.getRealProductionTimeFor("M2", 1)
+                + " " + graph.getReleaseTimeFor2("M2", 1)
+                + " R" + graph.getRealReleaseTimeFor2("M2", 1)
+                + " " + graph.getDueDateFor2("M2", 1)
                 + " " + graph.getMinimizedLatenessFor("M2", 1));
-        System.out.println(graph.getProductionTimeFor("M2", 2) + " " + graph.getReleaseTimeFor2("M2", 2)
-                + " " + graph.getDueDateFor("M2", 2)
+        System.out.println(graph.getProductionTimeFor2("M2", 2) + "R-Prod" + graph.getRealProductionTimeFor("M2", 2)
+                + " " + graph.getReleaseTimeFor2("M2", 2)
+                + " R" + graph.getRealReleaseTimeFor2("M2", 2)
+                + " " + graph.getDueDateFor2("M2", 2)
                 + " " + graph.getMinimizedLatenessFor("M2", 2));
         System.out.println("M3 after 1st iter");
-        System.out.println(graph.getProductionTimeFor("M3", 0) + " " + graph.getReleaseTimeFor2("M3", 0)
-                + " " + graph.getDueDateFor("M3", 0)
+        System.out.println(graph.getProductionTimeFor2("M3", 0) + "R-Prod" + graph.getRealProductionTimeFor("M3", 0)
+                + " " + graph.getReleaseTimeFor2("M3", 0)
+                + " R" + graph.getRealReleaseTimeFor2("M3", 0)
+                + " " + graph.getDueDateFor2("M3", 0)
                 + " " + graph.getMinimizedLatenessFor("M3", 0));
-        System.out.println(graph.getProductionTimeFor("M3", 1) + " " + graph.getReleaseTimeFor2("M3", 1)
-                + " " + graph.getDueDateFor("M3", 1)
+        System.out.println(graph.getProductionTimeFor2("M3", 1) + "R-Prod" + graph.getRealProductionTimeFor("M3", 1)
+                + " " + graph.getReleaseTimeFor2("M3", 1)
+                + " R" + graph.getRealReleaseTimeFor2("M3", 1)
+                + " " + graph.getDueDateFor2("M3", 1)
                 + " " + graph.getMinimizedLatenessFor("M3", 1));
 
         System.out.println(" Order 0 Makespan:" + graph.getMakespanForOrder(0));
