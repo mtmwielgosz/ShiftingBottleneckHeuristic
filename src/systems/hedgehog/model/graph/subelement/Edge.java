@@ -40,4 +40,9 @@ public class Edge {
     public int hashCode() {
         return Objects.hash(firstNode, weight, secondNode);
     }
+
+    @Override
+    public String toString () {
+        return "(" + firstNode.getName() + "," + firstNode.getMachine() + ") =" + weight + "=>" + "(" + secondNode.getName() + "," + secondNode.getMachine() + ")";
+    }
 }

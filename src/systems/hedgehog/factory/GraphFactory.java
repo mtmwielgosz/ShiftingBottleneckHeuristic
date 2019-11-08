@@ -1,8 +1,6 @@
 package systems.hedgehog.factory;
 
 import systems.hedgehog.model.graph.Graph;
-import systems.hedgehog.model.graph.SecGraph;
-import systems.hedgehog.model.graph.subelement.Edge;
 import systems.hedgehog.model.graph.subelement.Node;
 import systems.hedgehog.model.struct.Order;
 

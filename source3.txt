@@ -1,0 +1,8 @@
+2
+A B C
+D E
+A 1 M1
+B 2 M2
+C 3 M1
+D 4 M2
+E 5 M1
