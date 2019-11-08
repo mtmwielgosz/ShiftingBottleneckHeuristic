@@ -6,17 +6,17 @@ import java.util.List;
 
 public class ResultSubgraph {
 
-    private List<OrderInGraph> resultSubgraph;
+    private List<Edge> resultSubgraph;
     private int maxLateness;
     private String machine;
 
-    public ResultSubgraph(List<OrderInGraph> resultSubgraph, int maxLateness, String machine) {
+    public ResultSubgraph(List<Edge> resultSubgraph, int maxLateness, String machine) {
         this.resultSubgraph = resultSubgraph;
         this.maxLateness = maxLateness;
         this.machine = machine;
     }
 
-    public List<OrderInGraph> getResultSubgraph() {
+    public List<Edge> getResultSubgraph() {
         return resultSubgraph;
     }
 
@@ -31,8 +31,8 @@ public class ResultSubgraph {
     @Override
     public String toString() {
         String resultString = "Machine " + machine + ", Result ";
-        for(OrderInGraph operation : resultSubgraph) {
-            resultString += operation.getOrderId() + ",";
+        for(Edge edge : resultSubgraph) {
+            resultString += edge.toString() + ",";
         }
         return resultString + " MaxLateness: " + maxLateness;
     }
