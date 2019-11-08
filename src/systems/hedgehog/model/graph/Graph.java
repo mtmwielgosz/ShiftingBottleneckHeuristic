@@ -281,16 +281,6 @@ public class Graph {
         return maxCurrentReleaseTime;
     }
 
-    public int getReleaseTimeFor(Edge edge, int orderId) {
-        Optional<Edge> currentEdge = getStartEdgeFor(orderId);
-        int releaseTime = 0;
-        while(currentEdge.isPresent() && !edge.equals(currentEdge.get())) {
-            releaseTime += currentEdge.get().getWeight();
-            currentEdge = getNextEdgeFor(currentEdge.get(), orderId);
-        }
-        return releaseTime;
-    }
-
     public int getDueDateFor2(String currentMachine, int endingOrderId) { // todo for last of machines
 
         return getMakespan() - getMakespanForOrder(endingOrderId) + getRealProductionTimeFor(currentMachine, endingOrderId) + getRealReleaseTimeFor2(currentMachine, endingOrderId);
