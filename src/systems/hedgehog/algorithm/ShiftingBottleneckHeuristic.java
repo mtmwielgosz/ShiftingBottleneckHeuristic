@@ -41,14 +41,19 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
 
             if(currentBestRes.isPresent()) {
                 System.out.println("Chosen: " + currentBestRes.get());
-                List<OrderInGraph> orders = currentBestRes.get().getResultSubgraph();
-                for(int indexOfOrder = 0; indexOfOrder < orders.size() - 1; indexOfOrder++) {
-                    Optional<Edge> currentEdge = graph.getLastEdgeFor(currentBestRes.get().getMachine(), orders.get(indexOfOrder).getOrderId());
-                    Optional<Edge> nextEdge = graph.getLastEdgeFor(currentBestRes.get().getMachine(), orders.get(indexOfOrder + 1).getOrderId());
-                    if(currentEdge.isPresent() && nextEdge.isPresent()) {
-                        result.add(graph.addEdge(graph.getOrder(currentEdge.get()).get().getOrderId(), currentEdge.get().getFirstNode(), nextEdge.get().getFirstNode()));
+                List<Edge> newEdges = currentBestRes.get().getResultSubgraph();
+                for(int indexOfEdge = 0; indexOfEdge < newEdges.size() - 1; indexOfEdge++) {
+                    Edge currentEdge = newEdges.get(indexOfEdge);
+                    Edge nextEdge = newEdges.get(indexOfEdge + 1);
+                    if(graph.getOrder(currentEdge).isPresent() && graph.getOrder(nextEdge).isPresent()
+                            && !graph.getOrder(currentEdge).get().equals(graph.getOrder(nextEdge).isPresent())) {
+                        result.add(graph.addEdge(graph.getOrder(currentEdge).get().getOrderId(), currentEdge.getFirstNode(), nextEdge.getFirstNode()));
+                    } else {
+                        result.add(currentEdge);
                     }
+
                 }
+                result.add(newEdges.get(newEdges.size() - 1));
                 machines.remove(currentBestRes.get().getMachine());
             } else {
                 System.out.println("Whole makespan: " + graph.getMakespan());
@@ -59,12 +64,11 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
             System.out.println();
         }
 
-        List<MakespanResult> mrList = new LinkedList<>();
-        for(OrderInGraph order : graph.getOrders()) {
-            mrList.add(graph.getMakespanForEndingOrder(order.getOrderId()));
+        for(Edge resultEdge : result) {
+            int releaseTime = graph.getReleaseTimeForEdge(resultEdge);
+            int endTime = releaseTime + resultEdge.getWeight();
+            System.out.println(resultEdge.getFirstNode().getName() + " - " +resultEdge.getFirstNode().getMachine() + ", start: " + releaseTime + ", end: " + endTime);
         }
-
-        System.out.println(mrList);
 
         return null;
 
