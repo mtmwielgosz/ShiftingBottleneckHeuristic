@@ -1,72 +1,58 @@
 package systems.hedgehog;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.IntervalCategoryDataset;
-import org.jfree.data.gantt.Task;
-import org.jfree.data.gantt.TaskSeries;
-import org.jfree.data.gantt.TaskSeriesCollection;
 import systems.hedgehog.model.result.SchedulingResult;
 
-import javax.swing.*;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-public class GanttChartForGraph extends JFrame {
+class GanttChartForGraph {
 
-        private static final long serialVersionUID = 1L;
+    private static final int BEFORE_LINE = 3;
+    private static final String SEPARATOR = "|";
+    private String title;
+    private List<SchedulingResult> results;
 
-        private GanttChartForGraph(String title, List<SchedulingResult> results) {
-            super(title);
-            IntervalCategoryDataset dataset = getDataset(results);
-            JFreeChart chart = ChartFactory.createGanttChart(title,"Machines","Timeline",
-                    dataset, false, false, false);
-            ChartPanel panel = new ChartPanel(chart);
-            setContentPane(panel);
-        }
 
-        private IntervalCategoryDataset getDataset(List<SchedulingResult> results) {
-
-            int maxMakespan = results.stream().flatMapToInt(result -> IntStream.of(result.getFinishTime())).max().orElse(0);
-
-            TaskSeries scheduling = new TaskSeries("Scheduling");
-            scheduling.add(new Task("Whole makespan",
-                    Date.from(LocalDate.of(2020,1,1).atStartOfDay().toInstant(ZoneOffset.UTC)),
-                    Date.from(LocalDate.of(2020, 1,1).plusDays(maxMakespan).atStartOfDay().toInstant(ZoneOffset.UTC))
-            ));
-
-            Set<String> machines = results.stream().map(SchedulingResult::getMachine).collect(Collectors.toSet());
-            for(String machine: machines) {
-                List<SchedulingResult> resultsForMachine = results.stream().filter(result -> result.getMachine().equals(machine)).collect(Collectors.toList());
-                Task dummyTask = new Task(machine, Date.from(LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)),
-                        Date.from(LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)));
-                for(SchedulingResult result : resultsForMachine) {
-                    Task subTask = new Task(result.getMachine(), Date.from(LocalDate.of(2020, 1, 1).plusDays(result.getStartTime()).atStartOfDay().toInstant(ZoneOffset.UTC)),
-                            Date.from(LocalDate.of(2020, 1, 1).plusDays(result.getFinishTime()).atStartOfDay().toInstant(ZoneOffset.UTC)));
-                    dummyTask.addSubtask(subTask);
-                }
-                scheduling.add(dummyTask);
-            }
-            TaskSeriesCollection dataset = new TaskSeriesCollection();
-            dataset.add(scheduling);
-            return dataset;
-        }
-
-        static void run(String title, List<SchedulingResult> results) {
-            SwingUtilities.invokeLater(() -> {
-                GanttChartForGraph example = new GanttChartForGraph(title, results);
-                example.setSize(1000, 500);
-                example.setLocationRelativeTo(null);
-                example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                example.setVisible(true);
-            });
-        }
+    GanttChartForGraph(String title, List<SchedulingResult> results) {
+        this.title = title;
+        this.results = results;
     }
+
+    @Override
+    public String toString() {
+
+        StringBuilder ganttChart = new StringBuilder(title + "\n");
+        Set<String> machines = results.stream().map(SchedulingResult::getMachine).collect(Collectors.toSet());
+        for(String machine: machines) {
+            StringBuilder lineForMachine = new StringBuilder(machine + SEPARATOR);
+            List<SchedulingResult> resultsForMachine = results.stream().filter(result -> result.getMachine().equals(machine)).collect(Collectors.toList());
+            for(SchedulingResult result : resultsForMachine) {
+                int lengthOfEmptyLineBefore = result.getStartTime() - (lineForMachine.length() - BEFORE_LINE);
+                int lengthOfJobLine = result.getFinishTime() - result.getStartTime();
+                lineForMachine.append(getLine(lengthOfEmptyLineBefore));
+                lineForMachine.append(getLine(lengthOfJobLine, result.getJob()));
+            }
+            ganttChart.append(lineForMachine).append("|\n");
+        }
+        return ganttChart.toString();
+    }
+
+    private String getLine(int lineSize, String character) {
+        if(lineSize <= 0) {
+            return "";
+        }
+        StringBuilder line = new StringBuilder();
+        for(int i = 0; i < lineSize; i++) {
+            line.append(character);
+        }
+        return line.toString();
+    }
+
+    private String getLine(int lineSize) {
+        return getLine(lineSize, "_");
+    }
+
+}
 
 
