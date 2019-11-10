@@ -1,7 +1,5 @@
 package systems.hedgehog.model.graph.subelement;
 
-import systems.hedgehog.model.struct.OrderInGraph;
-
 import java.util.List;
 
 public class ResultSubgraph {
@@ -30,10 +28,10 @@ public class ResultSubgraph {
 
     @Override
     public String toString() {
-        String resultString = "Machine " + machine + ", Result ";
+        StringBuilder resultString = new StringBuilder("Machine: " + machine + ", Result: ");
         for(Edge edge : resultSubgraph) {
-            resultString += edge.toString() + ",";
+            resultString.append(edge.toString()).append(",");
         }
-        return resultString + " MaxLateness: " + maxLateness;
+        return resultString + " Max Lateness: " + maxLateness;
     }
 }

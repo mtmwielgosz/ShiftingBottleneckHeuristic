@@ -2,10 +2,10 @@ package systems.hedgehog.factory;
 
 import systems.hedgehog.model.graph.Graph;
 import systems.hedgehog.model.graph.subelement.Node;
-import systems.hedgehog.model.struct.Order;
+import systems.hedgehog.model.struct.OrderFromFile;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -18,12 +18,12 @@ public class GraphFactory {
     public static Graph generateGraph(String srcFile) throws IOException {
 
         List<Node> allNodes = new ArrayList<>();
-        List<String> source = Files.readAllLines(Paths.get(srcFile), Charset.forName("UTF-8"));
-        int numberOfOrders = Integer.valueOf(source.get(0));
-        List<Order> allOrders = new LinkedList<>();
+        List<String> source = Files.readAllLines(Paths.get(srcFile), StandardCharsets.UTF_8);
+        int numberOfOrders = Integer.parseInt(source.get(0));
+        List<OrderFromFile> allOrderFromFiles = new LinkedList<>();
         for(int index = 1; index <= numberOfOrders; index++) {
             List<String> jobsInCurrentOrder = new LinkedList<>(Arrays.asList(source.get(index).split(" ")));
-            allOrders.add(new Order(index - 1, jobsInCurrentOrder));
+            allOrderFromFiles.add(new OrderFromFile(index - 1, jobsInCurrentOrder));
         }
 
         for(int index = numberOfOrders + 1; index < source.size(); index++) {
@@ -32,34 +32,35 @@ public class GraphFactory {
         }
 
         Graph graph = new Graph();
-        String graphString = "";
-        for(Order currentOrder : allOrders) {
-            Node currentNode = allNodes.stream().filter(node -> node.getName().equals(currentOrder.getAllJobs().get(0))).findFirst().orElse(null);
-            graph.addEdge(currentOrder.getOrderId(), Graph.startNode, currentNode);
-            String orderString = "(" + Graph.startNode.getName() + ") =" + Graph.startNode.getWeightToNextNode() + "=> ";
+        StringBuilder graphString = new StringBuilder();
+        for(OrderFromFile currentOrderFromFile : allOrderFromFiles) {
+            Node currentNode = allNodes.stream().filter(node -> node.getName().equals(currentOrderFromFile.getAllJobs().get(0))).findFirst().orElse(null);
+            graph.addEdge(currentOrderFromFile.getOrderId(), Graph.startNode, currentNode);
+            StringBuilder orderString = new StringBuilder("(" + Graph.startNode.getName() + ") =" + Graph.startNode.getWeightToNextNode() + "=> ");
 
-            Integer indexOfNextNode = 1;
-            final Integer indexOfFirstNodeInOrder = indexOfNextNode;
-            Node nextNode = allNodes.stream().filter(node -> node.getName().equals(currentOrder.getAllJobs().get(indexOfFirstNodeInOrder))).findFirst().orElse(null);
+            int indexOfNextNode = 1;
+            final int indexOfFirstNodeInOrder = indexOfNextNode;
+            Node nextNode = allNodes.stream().filter(node -> node.getName().equals(currentOrderFromFile.getAllJobs().get(indexOfFirstNodeInOrder))).findFirst().orElse(null);
             while(nextNode != null) {
-                graph.addEdge(currentOrder.getOrderId(), currentNode, nextNode);
-                orderString += "(" + currentNode.getName() + ", " + currentNode.getMachine() + ") =" + currentNode.getWeightToNextNode() + "=> ";
+                graph.addEdge(currentOrderFromFile.getOrderId(), currentNode, nextNode);
+                assert currentNode != null;
+                orderString.append("(").append(currentNode.getName()).append(", ").append(currentNode.getMachine()).append(") =").append(currentNode.getWeightToNextNode()).append("=> ");
                 currentNode = nextNode;
                 indexOfNextNode++;
-                final Integer finalIndexOfNextNode = indexOfNextNode;
-                if(finalIndexOfNextNode < currentOrder.getAllJobs().size()) {
-                    nextNode = allNodes.stream().filter(node -> node.getName().equals(currentOrder.getAllJobs().get(finalIndexOfNextNode))).findFirst().orElse(null);
+                final int finalIndexOfNextNode = indexOfNextNode;
+                if(finalIndexOfNextNode < currentOrderFromFile.getAllJobs().size()) {
+                    nextNode = allNodes.stream().filter(node -> node.getName().equals(currentOrderFromFile.getAllJobs().get(finalIndexOfNextNode))).findFirst().orElse(null);
                 } else {
                     nextNode = null;
                 }
             }
-            graph.addEdge(currentOrder.getOrderId(), currentNode, Graph.endNode);
-            orderString += "(" + currentNode.getName() + ", " + currentNode.getMachine() + ") =" + currentNode.getWeightToNextNode() + "=> "
-                    + "(" + Graph.endNode.getName() + ")";
-            graphString += orderString + "\n";
+            graph.addEdge(currentOrderFromFile.getOrderId(), currentNode, Graph.endNode);
+            assert currentNode != null;
+            orderString.append("(").append(currentNode.getName()).append(", ").append(currentNode.getMachine()).append(") =").append(currentNode.getWeightToNextNode()).append("=> ").append("(").append(Graph.endNode.getName()).append(")");
+            graphString.append(orderString).append("\n");
         }
 
-        graph.setString(graphString);
+        graph.setString(graphString.toString());
         return graph;
     }
 

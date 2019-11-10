@@ -15,16 +15,8 @@ public class MakespanResult {
         return makespan;
     }
 
-    public void setMakespan(int makespan) {
-        this.makespan = makespan;
-    }
-
     public List<Edge> getEdges() {
         return edges;
-    }
-
-    public void setEdges(List<Edge> edges) {
-        this.edges = edges;
     }
 
     private int makespan;
