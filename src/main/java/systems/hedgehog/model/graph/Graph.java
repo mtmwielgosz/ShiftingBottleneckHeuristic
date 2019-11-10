@@ -19,7 +19,7 @@ public class Graph {
     protected ReleaseTimeCalc releaseTimeCalc;
     protected DueDateCalc dueDateCalc;
     protected MaxLatenessCalc maxLatenessCalc;
-    private String startingStringGraph;
+    private String startingGraphString;
 
     public static final Node startNode;
     public static final Node endNode;
@@ -156,11 +156,11 @@ public class Graph {
     }
 
     public void setString(String stringGraph) {
-        this.startingStringGraph = stringGraph;
+        this.startingGraphString = stringGraph;
     }
 
     @Override
     public String toString() {
-        return startingStringGraph;
+        return startingGraphString;
     }
 }
