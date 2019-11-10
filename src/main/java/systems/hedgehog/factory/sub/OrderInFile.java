@@ -1,8 +1,8 @@
-package systems.hedgehog.model.struct;
+package systems.hedgehog.factory.sub;
 
 import java.util.List;
 
-public class OrderFromFile {
+public class OrderInFile {
 
     private final int orderId;
     private final List<String> allJobs;
@@ -15,7 +15,7 @@ public class OrderFromFile {
         return orderId;
     }
 
-    public OrderFromFile(int orderId, List<String> allJobs) {
+    public OrderInFile(int orderId, List<String> allJobs) {
         this.orderId = orderId;
         this.allJobs = allJobs;
     }

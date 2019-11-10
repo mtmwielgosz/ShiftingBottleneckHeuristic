@@ -1,6 +1,6 @@
 package systems.hedgehog.model.result;
 
-import systems.hedgehog.model.graph.subelement.Edge;
+import systems.hedgehog.model.graph.sub.Edge;
 
 import java.util.List;
 

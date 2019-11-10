@@ -6,22 +6,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class GanttChartForGraph {
+class GanttChart {
 
     private static final int BEFORE_LINE = 3;
     private static final String SEPARATOR = "|";
-    private String title;
-    private List<SchedulingResult> results;
+    private final String title;
+    private final List<SchedulingResult> results;
 
 
-    GanttChartForGraph(String title, List<SchedulingResult> results) {
+    GanttChart(String title, List<SchedulingResult> results) {
         this.title = title;
         this.results = results;
     }
 
     @Override
     public String toString() {
-
         StringBuilder ganttChart = new StringBuilder(title + "\n");
         Set<String> machines = results.stream().map(SchedulingResult::getMachine).collect(Collectors.toSet());
         for(String machine: machines) {

@@ -1,14 +1,16 @@
-package systems.hedgehog.model.graph.subelement;
+package systems.hedgehog.model.result;
+
+import systems.hedgehog.model.graph.sub.Edge;
 
 import java.util.List;
 
-public class ResultSubgraph {
+public class SubgraphResult {
 
     private final List<Edge> resultSubgraph;
     private final int maxLateness;
     private final String machine;
 
-    public ResultSubgraph(List<Edge> resultSubgraph, int maxLateness, String machine) {
+    public SubgraphResult(List<Edge> resultSubgraph, int maxLateness, String machine) {
         this.resultSubgraph = resultSubgraph;
         this.maxLateness = maxLateness;
         this.machine = machine;

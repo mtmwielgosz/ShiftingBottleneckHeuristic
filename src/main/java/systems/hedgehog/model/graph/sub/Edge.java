@@ -1,4 +1,4 @@
-package systems.hedgehog.model.graph.subelement;
+package systems.hedgehog.model.graph.sub;
 
 import java.util.Objects;
 

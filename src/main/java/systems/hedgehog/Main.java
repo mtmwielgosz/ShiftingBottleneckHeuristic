@@ -1,7 +1,7 @@
 package systems.hedgehog;
 
 import systems.hedgehog.algorithm.Algorithm;
-import systems.hedgehog.algorithm.ShiftingBottleneckHeuristic;
+import systems.hedgehog.algorithm.impl.ShiftingBottleneckHeuristic;
 import systems.hedgehog.factory.GraphFactory;
 import systems.hedgehog.model.graph.Graph;
 import systems.hedgehog.model.result.SchedulingResult;
@@ -30,7 +30,7 @@ public class Main {
                     System.out.println(result);
                 }
                 Files.write(Paths.get("output/" + RESULT_FOR + inputFile.getFileName()).toAbsolutePath(), results.stream().map(SchedulingResult::toStringInFile).collect(Collectors.joining("\n")).getBytes());
-                System.out.println(new GanttChartForGraph("Scheduling for " + inputFile.getFileName(), results));
+                System.out.println(new GanttChart("Scheduling for " + inputFile.getFileName(), results));
             }
         }
     }

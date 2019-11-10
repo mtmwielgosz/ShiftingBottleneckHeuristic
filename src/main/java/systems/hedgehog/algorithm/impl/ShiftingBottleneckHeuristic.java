@@ -1,10 +1,11 @@
-package systems.hedgehog.algorithm;
+package systems.hedgehog.algorithm.impl;
 
+import systems.hedgehog.algorithm.Algorithm;
 import systems.hedgehog.model.graph.Graph;
-import systems.hedgehog.model.graph.subelement.Edge;
-import systems.hedgehog.model.graph.subelement.ResultSubgraph;
+import systems.hedgehog.model.graph.sub.Edge;
+import systems.hedgehog.model.result.SubgraphResult;
 import systems.hedgehog.model.result.SchedulingResult;
-import systems.hedgehog.model.struct.Order;
+import systems.hedgehog.model.graph.sub.Order;
 
 import java.util.*;
 
@@ -18,7 +19,7 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
         Set<Edge> result = new LinkedHashSet<>();
 
         while (true) {
-            List<ResultSubgraph> resultInIteration = new ArrayList<>();
+            List<SubgraphResult> resultInIteration = new ArrayList<>();
             for(String machine : machines) {
                 System.out.println(machine + " Iteration: " + iteration + ", Makespan: " + graph.getMakespan());
                 for(Order order : graph.getOrdersWithMachine(machine)) {
@@ -28,11 +29,11 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
                             + ", R-Release: " + graph.getReleaseTimeIncludingBlockingFor(machine, order.getOrderId())
                             + ", Due Date: " + graph.getDueDateFor(machine, order.getOrderId()));
                 }
-                ResultSubgraph resultSubgraph = graph.getMinimizedMaxLatenessResultFor(machine);
-                resultInIteration.add(resultSubgraph);
-                System.out.println("Minimized Max Lateness Subgraph: " + resultSubgraph);
+                SubgraphResult subgraphResult = graph.getMinimizedMaxLatenessResultFor(machine);
+                resultInIteration.add(subgraphResult);
+                System.out.println("Minimized Max Lateness Subgraph: " + subgraphResult);
             }
-            Optional<ResultSubgraph> currentMaxResult = resultInIteration.stream().max(Comparator.comparing(ResultSubgraph::getMaxLateness));
+            Optional<SubgraphResult> currentMaxResult = resultInIteration.stream().max(Comparator.comparing(SubgraphResult::getMaxLateness));
             if(currentMaxResult.isPresent()) {
                 System.out.println("Chosen: " + currentMaxResult.get() + "\n");
                 List<Edge> newEdges = currentMaxResult.get().getResultSubgraph();
@@ -45,7 +46,6 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
                     } else {
                         result.add(currentEdge);
                     }
-
                 }
                 result.add(newEdges.get(newEdges.size() - 1));
                 machines.remove(currentMaxResult.get().getMachine());
@@ -64,6 +64,5 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
         }
         return schedulingResults;
     }
-
 
 }

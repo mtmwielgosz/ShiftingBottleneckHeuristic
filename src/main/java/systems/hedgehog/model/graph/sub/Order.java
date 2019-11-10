@@ -1,6 +1,6 @@
-package systems.hedgehog.model.struct;
+package systems.hedgehog.model.graph.sub;
 
-import systems.hedgehog.model.graph.subelement.Edge;
+import systems.hedgehog.model.graph.sub.Edge;
 import java.util.LinkedList;
 import java.util.List;
 
