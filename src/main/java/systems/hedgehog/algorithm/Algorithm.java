@@ -8,4 +8,5 @@ import java.util.List;
 public interface Algorithm {
 
     List<SchedulingResult> findScheduling(Graph graph);
+    List<SchedulingResult> findSchedulingWithConsoleLogs(Graph graph);
 }
