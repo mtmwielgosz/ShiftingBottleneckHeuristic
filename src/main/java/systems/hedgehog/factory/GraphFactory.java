@@ -28,7 +28,7 @@ public class GraphFactory {
 
         for(int index = numberOfOrders + 1; index < source.size(); index++) {
             String[] currentNode = source.get(index).split(" ");
-            allNodes.add(new Node(currentNode[0], currentNode[2], Integer.valueOf(currentNode[1])));
+            allNodes.add(new Node(currentNode[0], currentNode[2], Integer.valueOf(currentNode[1]), Double.valueOf(currentNode[3])));
         }
 
         Graph graph = new Graph();

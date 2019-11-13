@@ -24,8 +24,8 @@ public class Graph {
     public static final Node startNode;
     public static final Node endNode;
     static {
-        startNode = new Node("U", "", 0);
-        endNode = new Node("V", "", 0);
+        startNode = new Node("U", "", 0, 0d);
+        endNode = new Node("V", "", 0, 0d);
     }
 
     public Graph() {
@@ -94,7 +94,7 @@ public class Graph {
     }
 
     public Edge addEdge(int orderId, Node srcNode, Node destNode) {
-        Edge newEdge = new Edge(srcNode, destNode, srcNode.getWeightToNextNode());
+        Edge newEdge = new Edge(srcNode, destNode, srcNode.getWeightToNextNode(), srcNode.getAgingRation());
         edges.add(newEdge);
         Optional<Order> currentOrder = getOrder(orderId);
         if(currentOrder.isPresent()) {

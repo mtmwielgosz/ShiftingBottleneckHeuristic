@@ -41,7 +41,7 @@ public class ShiftingBottleneckHeuristic implements Algorithm {
         while (true) {
             List<SubgraphResult> resultInIteration = new ArrayList<>();
             for(String machine : machines) {
-                System.out.println(machine + " Iteration: " + iteration + ", Makespan: " + graph.getMakespan());
+                System.out.println(machine + " Iteration: " + iteration + ", Makespan: " + graph.getMakespan()); // TODO makespan for machine
                 for(Order order : graph.getOrdersWithMachine(machine)) {
                     System.out.println("Order: " + order.getOrderId() + ", Production time: " + graph.getProductionTimeFor(machine, order.getOrderId())
                             + ", R-Production time: " + graph.getProductionTimeIncludingBlockingFor(machine, order.getOrderId())

@@ -2,6 +2,7 @@ package systems.hedgehog;
 
 import systems.hedgehog.algorithm.Algorithm;
 import systems.hedgehog.algorithm.impl.ShiftingBottleneckHeuristic;
+import systems.hedgehog.algorithm.impl.SortedAgingEffect;
 import systems.hedgehog.factory.GraphFactory;
 import systems.hedgehog.model.graph.Graph;
 import systems.hedgehog.model.result.SchedulingResult;
@@ -22,16 +23,21 @@ public class Main {
         try (Stream<Path> paths = Files.walk(Paths.get("input"))) {
             List<Path> inputFiles = paths.filter(Files::isRegularFile).collect(Collectors.toList());
             for(Path inputFile : inputFiles) {
-                Algorithm shiftingBottleneck = new ShiftingBottleneckHeuristic();
-                Graph graph = GraphFactory.generateGraph(inputFile);
-                System.out.println(graph);
-                List<SchedulingResult> results = shiftingBottleneck.findScheduling(graph);
-                for(SchedulingResult result : results) {
-                    System.out.println(result);
-                }
-                Files.write(Paths.get("output/" + RESULT_FOR + inputFile.getFileName()).toAbsolutePath(), results.stream().map(SchedulingResult::toStringInFile).collect(Collectors.joining("\n")).getBytes());
-                System.out.println(new GanttChart("Scheduling for " + inputFile.getFileName(), results));
+                printResult(new ShiftingBottleneckHeuristic(), inputFile);
             }
         }
     }
+
+    private static void printResult(Algorithm algorithm, Path inputFile) throws IOException {
+        Graph graph = GraphFactory.generateGraph(inputFile);
+        System.out.println(graph);
+        List<SchedulingResult> results = algorithm.findSchedulingWithConsoleLogs(graph);
+        for(SchedulingResult result : results) {
+            System.out.println(result);
+        }
+        Files.write(Paths.get("output/" + RESULT_FOR + inputFile.getFileName()).toAbsolutePath(), results.stream().map(SchedulingResult::toStringInFile).collect(Collectors.joining("\n")).getBytes());
+        System.out.println(new GanttChart("Scheduling for " + inputFile.getFileName(), results));
+
+    }
+
 }

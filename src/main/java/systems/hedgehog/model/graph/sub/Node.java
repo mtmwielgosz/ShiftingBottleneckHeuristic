@@ -4,8 +4,8 @@ public class Node {
 
     private final String name;
     private final String machine;
-
     private final Integer weightToNextNode;
+    private final Double agingRation;
 
     public String getName() {
         return name;
@@ -19,10 +19,15 @@ public class Node {
         return weightToNextNode;
     }
 
-    public Node(String name, String machine, Integer weightToNextNode) {
+    public Double getAgingRation() {
+        return agingRation;
+    }
+
+    public Node(String name, String machine, Integer weightToNextNode, Double agingRation) {
         this.name = name;
         this.machine = machine;
         this.weightToNextNode = weightToNextNode;
+        this.agingRation = agingRation;
     }
 
     @Override

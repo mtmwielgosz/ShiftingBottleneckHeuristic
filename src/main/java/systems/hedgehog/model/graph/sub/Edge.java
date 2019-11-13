@@ -8,6 +8,7 @@ public class Edge {
     private final Node firstNode;
     private final Node secondNode;
     private final Integer weight;
+    private final Double agingRation;
 
     public Node getFirstNode() {
         return firstNode;
@@ -21,10 +22,15 @@ public class Edge {
         return weight;
     }
 
-    public Edge(Node firstNode, Node secondNode, Integer weight) {
+    public Double getAgingRation() {
+        return agingRation;
+    }
+
+    public Edge(Node firstNode, Node secondNode, Integer weight, Double agingRation) {
         this.firstNode = firstNode;
         this.secondNode = secondNode;
         this.weight = weight;
+        this.agingRation = agingRation;
     }
 
     @Override

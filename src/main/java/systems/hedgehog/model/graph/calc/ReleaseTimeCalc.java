@@ -4,6 +4,7 @@ import systems.hedgehog.model.graph.Graph;
 import systems.hedgehog.model.graph.sub.Edge;
 import systems.hedgehog.model.graph.sub.Order;
 
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -58,7 +59,9 @@ public class ReleaseTimeCalc {
             if(startingEdge.isPresent()) {
                 Set<Edge> nextEdges = graph.getNextEdgesFor(startingEdge.get());
                 for(Edge nextEdge : nextEdges) {
-                    int nextReleaseTime = calculateReleaseTimeForSubgraph(nextEdge, neededEdge, 0);
+                    Set<Edge> visitedEdges = new LinkedHashSet<>();
+                    visitedEdges.add(nextEdge);
+                    int nextReleaseTime = calculateReleaseTimeForSubgraph(nextEdge, neededEdge, 0, visitedEdges);
                     if(nextReleaseTime > releaseTime) {
                         releaseTime = nextReleaseTime;
                     }
@@ -68,20 +71,22 @@ public class ReleaseTimeCalc {
         return releaseTime;
     }
 
-    private int calculateReleaseTimeForSubgraph(Edge edge, Edge neededEdge, int currentReleaseTime) {
+    private int calculateReleaseTimeForSubgraph(Edge edge, Edge neededEdge, int currentReleaseTime, Set<Edge> visitedEdges) {
         currentReleaseTime += edge.getWeight();
         Set<Edge> nextEdges = graph.getNextEdgesFor(edge);
         int maxCurrentReleaseTime = 0;
         int stableCurrentReleaseTime = currentReleaseTime;
         for(Edge nextEdge : nextEdges) {
+            if (!visitedEdges.contains(nextEdge)) {
+                visitedEdges.add(nextEdge);
+                if (neededEdge.equals(nextEdge)) {
+                    return currentReleaseTime;
+                }
 
-            if(neededEdge.equals(nextEdge)) {
-                return currentReleaseTime;
-            }
-
-            int nextCurrentReleaseTime = calculateReleaseTimeForSubgraph(nextEdge, neededEdge, stableCurrentReleaseTime);
-            if(nextCurrentReleaseTime > maxCurrentReleaseTime) {
-                maxCurrentReleaseTime = nextCurrentReleaseTime;
+                int nextCurrentReleaseTime = calculateReleaseTimeForSubgraph(nextEdge, neededEdge, stableCurrentReleaseTime, new LinkedHashSet<>(visitedEdges));
+                if (nextCurrentReleaseTime > maxCurrentReleaseTime) {
+                    maxCurrentReleaseTime = nextCurrentReleaseTime;
+                }
             }
         }
 
